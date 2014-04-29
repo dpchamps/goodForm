@@ -12,18 +12,20 @@ var goodForm = function(form, options) {
         }
         return a;
     }
-    var default_options = {
+    var defaultOptions = {
         honeypot : true
     };
 
-    _init();
+
 
     var _init = function(){
-        extend(default_options, options);
-        if(default_options.honeypot){
+        extend(defaultOptions, options);
+        if(defaultOptions.honeypot){
             _honeyPot();
         }
     };
+
+    _init();
 
     var _honeyPot = function(){
         var input1 = doc.createElement('input'),
