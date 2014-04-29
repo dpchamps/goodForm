@@ -8,7 +8,10 @@
 var doc = root.document;
 
 // Base function.
-var goodForm = function(form, options) {
+var goodForm = function(formId, options) {
+    //The form to edit
+    var form = doc.getElementById(formId);
+
     function extend( a, b ) {
         for( var key in b ) {
             if( b.hasOwnProperty( key ) ) {
@@ -24,6 +27,7 @@ var goodForm = function(form, options) {
 
 
     var _init = function(){
+
         extend(defaultOptions, options);
         if(defaultOptions.honeypot){
             _honeyPot();
@@ -32,13 +36,13 @@ var goodForm = function(form, options) {
 
     _init();
 
-    var _honeyPot = function(){
+    function _honeyPot(){
         var input1 = doc.createElement('input'),
             input2 = doc.createElement('input'),
             median = Math.floor(form.childNodes.length / 2);
 
-        input1.placeholder("Do Not Fill");
-        input2.placeholder("Do Not Fill");
+        input1.placeholder ="Do Not Fill";
+        input2.placeholder="Do Not Fill";
 
         input1.style.display = "none";
         input2.style.display = "none";
@@ -48,14 +52,14 @@ var goodForm = function(form, options) {
 
         form.appendChild(input2);
         form.insertBefore(input1, form.childNodes[median]);
-    };
+    }
 
     return {
         addMask : function(id, o){
             //
         }
 
-    }
+    };
 
 };
 

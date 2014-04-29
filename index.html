@@ -69,7 +69,7 @@
             <div class="form-field-outer">
                 <div class="form-field-inner">
 
-                    <form action="demo/server/server.js">
+                    <form id="testForm" method="POST" action="demo/server/server.js">
                         <fieldset>
                             <legend>Contact Us!</legend>
                                 <ol>
@@ -95,5 +95,9 @@
 
 
     </div>
+    <script src="dist/goodForm.js"></script>
+    <script>
+        var goodForm = goodForm("testForm");
+    </script>
   </body>
 </html>
