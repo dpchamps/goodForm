@@ -1,0 +1,63 @@
+.form-field-outer{
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    -webkit-box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
+    padding: 15px;
+}
+.form-field-inner{
+    width: 100%;
+    margin: 0 auto;
+}
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+}
+fieldset{
+    text-align: left;
+    border: none;
+    width: 0;
+    display:inline;
+}
+legend{
+    padding-bottom: 20px;
+    font-size: 23px;
+}
+label{
+    display:inline-block;
+    vertical-align: top;
+    margin: 10px 0;
+}
+input{
+
+}
+textarea, input{
+    width: 250px;
+    padding: 5px;
+    letter-spacing:1px;
+    font-size: 17px;
+}
+
+label{
+    width: 170px;
+}
+
+button[type=submit]{
+
+}
+
+.centerButton{
+    text-align: center;
+}
+.rightButton{
+    text-align: right;
+}
+button#submit{
+    padding: 10px;
+    font-size: 18px;
+    margin: 10px 0px;
+}

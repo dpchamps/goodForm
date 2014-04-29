@@ -3,12 +3,97 @@
   <head>
     <title>goodForm | Provides client & server-side form verification, and other usefull things such as input masking etc... </title>
     <link rel="stylesheet" href="./demo/assets/normalize.css">
+      <link rel="stylesheet" href="goodForm.css"/>
+      <style>
+          body {
+              margin: 0;
+              background: rgba(0,0,0,0.4);
+          }
+          .container{
+              max-width: 740px;
+              width:100%;
+              text-align: center;
+              position: relative;
+              margin: 20px auto;
+              background: #fffff0;
+              -webkit-box-shadow: 0 1px 1px 0 #000;
+              -moz-box-shadow: 0 1px 1px 0 #000;
+              box-shadow: 0 1px 1px 0 #000;
+              padding-top: 20px;
+              padding-bottom: 20px;
+          }
+          .row{
+              min-height: 50px;
+              width:100%;
+          }
+          h1,h2, a{
+              font-family:"Bookman", Georgia, "Times New Roman", serif;
+          }
+          h1{
+              font-size: 35px;
+          }
+          h2{
+              font-size: 28px;
+          }
+          ul{
+              list-style: none;
+          }
+          ul li{
+              background-color: #EAADEA;
+              padding: 15px;
+              display: inline-block;
+              -webkit-box-shadow: 1px 1px 1px 1px rgba(183, 117,117, 0.7);
+              -moz-box-shadow: 1px 1px 1px 1px rgba(183, 117,117, 0.7);
+              box-shadow: 1px 1px 1px 1px rgba(183, 117,117, 0.7);
+              margin:5px;
+          }
+          a{
+              font-size: 20px;
+              text-decoration: none;
+              color: #842D2D;
+
+          }
+          a:hover, a:active{
+              text-decoration: none;
+              color:inherit;
+          }
+
+      </style>
   </head>
   <body>
-    <h1>goodForm</h1>
-    <p>Provides client & server-side form verification, and other usefull things such as input masking etc... </p>
-    <p>Check out the <a href="http://gasolinewaltz.github.io/goodForm/demo/index.html">project homepage</a>.</p>
-    <p>Check out the <a href="https://github.com/gasolinewaltz/goodForm">source code on GitHub</a>.</p>
-    <p>Copyright 2014 David Campion</p>
+    <div class="container">
+        <div class="row">
+            <h1>Good Form!</h1>
+        </div>
+        <div class="row">
+            <div class="form-field-outer">
+                <div class="form-field-inner">
+
+                    <form action="demo/server/server.js">
+                        <fieldset>
+                            <legend>Contact Us!</legend>
+                                <ol>
+                                    <li><label for="first">First Name</label><input id="first" type="text" placeholder="Adelaid" required="true"/></li>
+                                    <li><label for="last">Last Name</label><input id="last" type="text" placeholder="Jones" required="true"/></li>
+                                    <li><label for="email">Email</label><input id="email" type="text" placeholder="example@email.com" required="true"/></li>
+                                    <li><label for="text-body">Email Body</label><textarea name="body" id="text-body" cols="30" rows="6" placeholder="We're excited to hear from you!" required="true"></textarea></li>
+                                    <li ><button id="submit" class="centerButton" type="submit">Submit</button></li>
+                                </ol>
+                        </fieldset>
+                    </form>
+                </div><!--/ff-inner -->
+            </div><!-- /dd-outer -->
+        </div>
+        <div class="row">
+            <ul>
+                <li><a href="#contact">Contact Form</a></li>
+                <li><a href="#appointment">Appointment Form</a></li>
+                <li><a href="#signup">Signup Form</a></li>
+            </ul>
+
+        </div>
+
+
+    </div>
   </body>
 </html>
