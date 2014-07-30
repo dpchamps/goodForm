@@ -76,6 +76,9 @@
                                     <li><label for="first">First Name</label><input id="first" type="text" placeholder="Adelaid" required="true"/></li>
                                     <li><label for="last">Last Name</label><input id="last" type="text" placeholder="Jones" required="true"/></li>
                                     <li><label for="email">Email</label><input id="email" type="text" placeholder="example@email.com" required="true"/></li>
+
+                                    <li><label for="phone">Phone</label><input id="phone" type="text" placeholder="(555) 555 5555" required="true"/></li>
+
                                     <li><label for="text-body">Email Body</label><textarea name="body" id="text-body" cols="30" rows="6" placeholder="We're excited to hear from you!" required="true"></textarea></li>
                                     <li ><button id="submit" class="centerButton" type="submit">Submit</button></li>
                                 </ol>
@@ -98,6 +101,10 @@
     <script src="dist/goodForm.js"></script>
     <script>
         var goodForm = goodForm("testForm");
+        goodForm.addMask("phone", {
+            placeholder: "{(}###{)}{ }###{ }####",
+            numberMask: "5"
+        });
     </script>
   </body>
 </html>
