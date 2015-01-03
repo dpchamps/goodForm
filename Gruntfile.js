@@ -12,6 +12,10 @@ module.exports = function(grunt) {
         src: [
           'src/_intro.js',
           'src/main.js',
+          'src/helpers.js',
+          'src/parcePlaceholder.js',
+          'src/addNumberMask.js',
+          'src/export.js',
           'src/_outro.js'
         ],
         dest: 'dist/<%= pkg.name.replace(".js", "") %>.js'
@@ -95,6 +99,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ['jshint', 'qunit']);
   grunt.registerTask('default', ['concat', 'jshint', 'qunit', 'uglify']);
+  grunt.registerTask('build', ['concat', 'uglify']);
 
     // Creates the `server` task
     grunt.registerTask('server', [

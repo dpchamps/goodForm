@@ -100,10 +100,10 @@
     </div>
     <script src="dist/goodForm.js"></script>
     <script>
-        var goodForm = goodForm("testForm");
-        goodForm.addMask("phone", {
-            placeholder: "{(}###{)}{ }###{ }####",
-            numberMask: "5"
+
+        GoodForm.addNumberMask("phone", {
+           placeholder: "{(}###{)}{ }###{ }####",
+           numberMask: "5"
         });
     </script>
   </body>

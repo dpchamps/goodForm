@@ -61,3 +61,9 @@ button#submit{
     font-size: 18px;
     margin: 10px 0px;
 }
+.valid{
+    border-color: green;
+}
+.invalid{
+    border-color: red;
+}
