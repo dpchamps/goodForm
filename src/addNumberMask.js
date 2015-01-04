@@ -1,40 +1,39 @@
 /**
  * Created by Dave on 12/31/2014.
  */
-
+/*
 GoodForm.addNumberMask = function(id, maskObject){
 
     var mask = this.parsePlaceholder(maskObject.placeholder, maskObject.numberMask),
+        //the value of the data in the input (not including symbols in the mask
         actualText = "",
+        //the current position of the cursor
         textPos = 0,
         el = this.doc.getElementById(id);
 
 
     function keydownListener(e){
         if(e.which < 48){
-            var charPos = el.selectionStart;
             e.preventDefault();
             switch (e.which){
                 case 8:
+                    if(el.selectionStart < el.selectionEnd){
+                        GoodForm.helpers.setCaretPosition(el, textPos);
+                    }
                     //backspace
-                    if(charPos === mask.charMap[0]+1){
+                    if(textPos === mask.charMap[0]+1){
                         //nothing
                     }else{
                         var newArr = mask.charMap.slice(1, mask.charMap.length).reverse();
                         newArr.forEach(function(value){
-                            if(charPos-1 === value){
-                                el.selectionStart = charPos-1;
-                                el.selectionEnd = charPos-1;
+                            if(textPos-1 === value){
+                                GoodForm.helpers.setCaretPosition(el, textPos);
                                 textPos--;
-                                charPos = charPos-1;
                             }
                         });
-                        el.value = GoodForm.helpers.replaceAt(el.value, charPos-1, mask.numberMask);
+                        el.value = GoodForm.helpers.replaceAt(el.value, textPos-1, mask.numberMask);
                         el.placeholder = el.value;
-                        el.selectionStart = charPos-1;
-                        el.selectionEnd = charPos-1;
-                        textPos--;
-
+                        GoodForm.helpers.setCaretPosition(el, --textPos);
                         actualText = el.value;
                     }
                     break;
@@ -43,6 +42,10 @@ GoodForm.addNumberMask = function(id, maskObject){
     }
     function keypressListener(e){
         e.preventDefault();
+
+        if(el.selectionStart < el.selectionEnd){
+            GoodForm.helpers.setCaretPosition(el, textPos);
+        }
         var char = String.fromCharCode(e.which);
         if(textPos < el.maxLength && GoodForm.helpers.isNumber(char)){
             var charPos = el.selectionStart;
@@ -66,6 +69,7 @@ GoodForm.addNumberMask = function(id, maskObject){
         if(textPos <= mask.charMap[0]+1){
             el.value = mask.value;
             GoodForm.helpers.setCaretPosition(el, mask.charMap[0]+1);
+            console.log("Click: ", textPos, el.selectionStart);
 
             textPos = mask.charMap[0]+1;
         }else{
@@ -74,31 +78,43 @@ GoodForm.addNumberMask = function(id, maskObject){
             el.selectionEnd = textPos;
         }
     }
+    function keyuplistener(e){
 
+    }
     function focusListener(e){
         e.preventDefault();
-
-        GoodForm.helpers.removeClass(el, 'valid');
-        GoodForm.helpers.removeClass(el, 'invalid');
+        if(textPos <= mask.charMap[0]+1){
+            el.value = mask.value;
+            GoodForm.helpers.setCaretPosition(el, mask.charMap[0]+1);
+            textPos = mask.charMap[0]+1;
+        }else{
+            el.value = actualText;
+            el.selectionStart = textPos;
+            el.selectionEnd = textPos;
+        }
+        console.log("Focus: ",textPos, el.selectionStart);
         root.addEventListener('keydown', keydownListener, false);
         root.addEventListener('keypress', keypressListener, false);
+        root.addEventListener('keyup', keyuplistener, false);
     }
 
     function blurListener(e){
         e.preventDefault();
-        if(textPos === el.maxLength){
-            GoodForm.helpers.addClass(el, 'valid');
-        }else{
-            GoodForm.helpers.addClass(el, 'invalid');
-            el.value = "";
-        }
         root.removeEventListener('keydown', keydownListener, false);
         root.removeEventListener('keypress', keypressListener, false);
+        root.removeEventListener('keyup', keyuplistener, false);
     }
 
     //bind
     el.maxLength = mask.value.length;
-    el.addEventListener('click', clickListener, false);
+    el.placeholder = mask.value;
+    //GoodForm.helpers.addClass(el, 'noselect');
+    //el.addEventListener('click', clickListener, false);
+    el.addEventListener('select', function(e){
+        console.log("start", el.selectionStart);
+        console.log("end", el.selectionEnd);
+    }, false);
     el.addEventListener('focus', focusListener, false);
     el.addEventListener('blur', blurListener, false);
 };
+    */

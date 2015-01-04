@@ -5,41 +5,11 @@
 
 /* goodForm main */
 
+var document = root.document,
+    GoodForm = {
+        doc : document
+    };
 
-// An extend function, automatically makes deep copies
-var extend = function(dest, sources, deepCopy){
-    if(typeof deepCopy === 'undefined'){
-        deepCopy = false;
-    }
-    var args = Array.prototype.slice.call(arguments);
-    for(var i = 1; i < args.length; i++){
-        for(var key in args[i]){
-            if(args[i].hasOwnProperty(key)){
-                if(deepCopy){
-                    if(typeof args[i][key] === 'object' && (args[i][key] instanceof Array) === false){
-                        dest[key] = dest[key] || {};
-                        extend(dest[key], args[i][key]);
-                    }else{
-                        dest[key] = args[i][key];
-                    }
-                }else{
-                    dest[key] = args[i][key];
-                }
-
-            }
-        }
-    }
-    return dest;
-};
-
-var GoodForm = {};
-
-GoodForm.extend = extend;
-var config = {
-    doc : root.document
-};
-
-extend(GoodForm, config);
 
 /**
  * Created by Dave on 1/2/2015.
@@ -56,7 +26,6 @@ GoodForm.helpers = {
         }
 
         if(found){
-            //
         }else{
             elm.className += " "+str;
         }
@@ -82,150 +51,101 @@ GoodForm.helpers = {
 /**
  * Created by Dave on 1/2/2015.
  */
-
-var parsePlaceholder = function(placeholder, mask){
-    if(typeof placeholder === 'undefined' ){
-        throw new Error("placeholder undefined");
-    }
-    if( typeof mask === 'undefined'){
-        mask = "5";
-    }
-    placeholder = placeholder.replace(/[#]/g, mask);
-    var charMap = [],
+var phoneAPI = function(placeholder){
+        //An array for mapping selection ranges
+    var rangeMap = [],
+        //An array that maps the brace characters
+        braceMap = [],
+        //A string that contains the real value, excluding braces
+        realString = "",
+        //An array that contains the placeholder chars
+        parseArr = placeholder.split(''),
+        //for keeping track of braces
         braceCount = 0,
-        newString = "",
-        s = placeholder,
-        j = 0,
-        totalBraces = 0;
+        //for keeping track of selection range
+        rangeStart = false;
+    console.log(parseArr);
+    for(var i = 0; i < parseArr.length; i++){
 
-    for(var i = 0; i < s.length; i++){
-        if(s[i] === '{' && braceCount === 0){
+        if( parseArr[i] === '{'){
             braceCount++;
-            totalBraces+=1;
+            //if a current range is open, it becomes closed at the idx before the next open brace
+            if(rangeStart){
+                rangeStart = false;
+                rangeMap[rangeMap.length-1].end = realString.length-1;
+            }
             continue;
         }
-        if(s[i] === '}' && braceCount === 1){
+        if( parseArr[i] === '}' ){
             braceCount--;
-            totalBraces+=1;
             continue;
         }
-        if(braceCount === 1){
-            newString += s[i];
-            charMap[j++] = i-totalBraces;
+        if( braceCount === 1 ){
+            //the real string should contain symbols included between braces
+            realString += parseArr[i];
+            //the braceMap contains the position of characters between braces,
+            //  therefore, any braceMap position is equal to the length of the realString after the symbol has been added to the string
+            braceMap.push(realString.length-1);
             continue;
         }
-        if(braceCount === 0){
-            newString += s[i];
-
+        if( braceCount === 0 ){
+            realString += parseArr[i];
+            //if a range has not started, push the begining
+            if(rangeStart === false){
+                rangeStart = true;
+                rangeMap.push({start : realString.length-1});
+            }
         }
-
     }
-
-    return {
-        value : newString,
-        charMap : charMap,
-        numberMask : mask
+    //the last case, where a range is open, and there are no more braces
+    if(rangeStart){
+        rangeMap[rangeMap.length-1].end = realString.length-1;
+    }
+    return{
+        rangeMap : rangeMap,
+        braceMap : braceMap,
+        value    : realString
     }
 };
-/*
-For now, I'll use the iteration version because this recursive method is far slower
 
-
-var parsePlaceholder = function(placeholder, mask, recObj){
-    if(typeof placeholder === 'undefined' ){
-        throw new Error("placeholder undefined");
-    }
-    if( typeof mask === 'undefined'){
-        mask = " ";
-    }
-    if(typeof recObj === 'undefined'){
-        recObj = {
-            charMap : [],
-            braceCount : 0,
-            totalBraces: 0,
-            newString  : "",
-            s : placeholder.replace(/[#]/g, mask).split(''),
-            i : 0,
-            j : 0
-        }
-    }else{
-        recObj.i++;
-    }
-
-    switch(recObj.braceCount){
-        case 0:
-            if(recObj.s[0] === '{' ){
-                recObj.s.shift();
-                recObj.braceCount++;
-                recObj.totalBraces++;
-            }else{
-                recObj.newString += recObj.s.shift();
-            }
-            break;
-        case 1:
-            if(recObj.s[0] === '}'){
-                recObj.s.shift();
-                recObj.braceCount--;
-                recObj.totalBraces++;
-            }else{
-                recObj.newString += recObj.s.shift();
-                recObj.charMap.push(recObj.i);
-            }
-            break;
-    }
-
-    if(recObj.s.length > 0){
-        GoodForm.parsePlaceholder(placeholder, mask, recObj)
-    }
-    if(recObj.s.length===0){
-        return {
-            value : recObj.newString,
-            charMap : recObj.charMap,
-            numberMask : mask
-        };
-    }
-
-};
-*/
-GoodForm.parsePlaceholder = parsePlaceholder;
+GoodForm.phoneAPI = phoneAPI;
 
 /**
  * Created by Dave on 12/31/2014.
  */
-
+/*
 GoodForm.addNumberMask = function(id, maskObject){
 
     var mask = this.parsePlaceholder(maskObject.placeholder, maskObject.numberMask),
+        //the value of the data in the input (not including symbols in the mask
         actualText = "",
+        //the current position of the cursor
         textPos = 0,
         el = this.doc.getElementById(id);
 
 
     function keydownListener(e){
         if(e.which < 48){
-            var charPos = el.selectionStart;
             e.preventDefault();
             switch (e.which){
                 case 8:
+                    if(el.selectionStart < el.selectionEnd){
+                        GoodForm.helpers.setCaretPosition(el, textPos);
+                    }
                     //backspace
-                    if(charPos === mask.charMap[0]+1){
+                    if(textPos === mask.charMap[0]+1){
                         //nothing
                     }else{
                         var newArr = mask.charMap.slice(1, mask.charMap.length).reverse();
                         newArr.forEach(function(value){
-                            if(charPos-1 === value){
-                                el.selectionStart = charPos-1;
-                                el.selectionEnd = charPos-1;
+                            if(textPos-1 === value){
+                                GoodForm.helpers.setCaretPosition(el, textPos);
                                 textPos--;
-                                charPos = charPos-1;
                             }
                         });
-                        el.value = GoodForm.helpers.replaceAt(el.value, charPos-1, mask.numberMask);
+                        el.value = GoodForm.helpers.replaceAt(el.value, textPos-1, mask.numberMask);
                         el.placeholder = el.value;
-                        el.selectionStart = charPos-1;
-                        el.selectionEnd = charPos-1;
-                        textPos--;
-
+                        GoodForm.helpers.setCaretPosition(el, --textPos);
                         actualText = el.value;
                     }
                     break;
@@ -234,6 +154,10 @@ GoodForm.addNumberMask = function(id, maskObject){
     }
     function keypressListener(e){
         e.preventDefault();
+
+        if(el.selectionStart < el.selectionEnd){
+            GoodForm.helpers.setCaretPosition(el, textPos);
+        }
         var char = String.fromCharCode(e.which);
         if(textPos < el.maxLength && GoodForm.helpers.isNumber(char)){
             var charPos = el.selectionStart;
@@ -257,6 +181,7 @@ GoodForm.addNumberMask = function(id, maskObject){
         if(textPos <= mask.charMap[0]+1){
             el.value = mask.value;
             GoodForm.helpers.setCaretPosition(el, mask.charMap[0]+1);
+            console.log("Click: ", textPos, el.selectionStart);
 
             textPos = mask.charMap[0]+1;
         }else{
@@ -265,39 +190,64 @@ GoodForm.addNumberMask = function(id, maskObject){
             el.selectionEnd = textPos;
         }
     }
+    function keyuplistener(e){
 
+    }
     function focusListener(e){
         e.preventDefault();
-
-        GoodForm.helpers.removeClass(el, 'valid');
-        GoodForm.helpers.removeClass(el, 'invalid');
+        if(textPos <= mask.charMap[0]+1){
+            el.value = mask.value;
+            GoodForm.helpers.setCaretPosition(el, mask.charMap[0]+1);
+            textPos = mask.charMap[0]+1;
+        }else{
+            el.value = actualText;
+            el.selectionStart = textPos;
+            el.selectionEnd = textPos;
+        }
+        console.log("Focus: ",textPos, el.selectionStart);
         root.addEventListener('keydown', keydownListener, false);
         root.addEventListener('keypress', keypressListener, false);
+        root.addEventListener('keyup', keyuplistener, false);
     }
 
     function blurListener(e){
         e.preventDefault();
-        if(textPos === el.maxLength){
-            GoodForm.helpers.addClass(el, 'valid');
-        }else{
-            GoodForm.helpers.addClass(el, 'invalid');
-            el.value = "";
-        }
         root.removeEventListener('keydown', keydownListener, false);
         root.removeEventListener('keypress', keypressListener, false);
+        root.removeEventListener('keyup', keyuplistener, false);
     }
 
     //bind
     el.maxLength = mask.value.length;
-    el.addEventListener('click', clickListener, false);
+    el.placeholder = mask.value;
+    //GoodForm.helpers.addClass(el, 'noselect');
+    //el.addEventListener('click', clickListener, false);
+    el.addEventListener('select', function(e){
+        console.log("start", el.selectionStart);
+        console.log("end", el.selectionEnd);
+    }, false);
     el.addEventListener('focus', focusListener, false);
     el.addEventListener('blur', blurListener, false);
 };
+    */
 
 /**
  * Created by Dave on 12/31/2014.
  */
 
-root.GoodForm = GoodForm;
+//root.GoodForm = GoodForm;
+
+
+var nl = document.querySelectorAll('[data-addnumbermask]');
+var selectors = Array.prototype.slice.call(nl);
+
+selectors.forEach(function(el){
+    //GoodForm.addNumberMask
+   GoodForm.addNumberMask(el.id, {
+       placeholder: el.placeholder,
+       numberMask: el.dataset.addnumbermask
+   });
+});
+
 
 }(this));

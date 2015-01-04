@@ -1,109 +1,61 @@
 /**
  * Created by Dave on 1/2/2015.
  */
-
-var parsePlaceholder = function(placeholder, mask){
-    if(typeof placeholder === 'undefined' ){
-        throw new Error("placeholder undefined");
-    }
-    if( typeof mask === 'undefined'){
-        mask = "5";
-    }
-    placeholder = placeholder.replace(/[#]/g, mask);
-    var charMap = [],
+var phoneAPI = function(placeholder){
+        //An array for mapping selection ranges
+    var rangeMap = [],
+        //An array that maps the brace characters
+        braceMap = [],
+        //A string that contains the real value, excluding braces
+        realString = "",
+        //An array that contains the placeholder chars
+        parseArr = placeholder.split(''),
+        //for keeping track of braces
         braceCount = 0,
-        newString = "",
-        s = placeholder,
-        j = 0,
-        totalBraces = 0;
+        //for keeping track of selection range
+        rangeStart = false;
+    console.log(parseArr);
+    for(var i = 0; i < parseArr.length; i++){
 
-    for(var i = 0; i < s.length; i++){
-        if(s[i] === '{' && braceCount === 0){
+        if( parseArr[i] === '{'){
             braceCount++;
-            totalBraces+=1;
+            //if a current range is open, it becomes closed at the idx before the next open brace
+            if(rangeStart){
+                rangeStart = false;
+                rangeMap[rangeMap.length-1].end = realString.length-1;
+            }
             continue;
         }
-        if(s[i] === '}' && braceCount === 1){
+        if( parseArr[i] === '}' ){
             braceCount--;
-            totalBraces+=1;
             continue;
         }
-        if(braceCount === 1){
-            newString += s[i];
-            charMap[j++] = i-totalBraces;
+        if( braceCount === 1 ){
+            //the real string should contain symbols included between braces
+            realString += parseArr[i];
+            //the braceMap contains the position of characters between braces,
+            //  therefore, any braceMap position is equal to the length of the realString after the symbol has been added to the string
+            braceMap.push(realString.length-1);
             continue;
         }
-        if(braceCount === 0){
-            newString += s[i];
-
+        if( braceCount === 0 ){
+            realString += parseArr[i];
+            //if a range has not started, push the begining
+            if(rangeStart === false){
+                rangeStart = true;
+                rangeMap.push({start : realString.length-1});
+            }
         }
-
     }
-
-    return {
-        value : newString,
-        charMap : charMap,
-        numberMask : mask
+    //the last case, where a range is open, and there are no more braces
+    if(rangeStart){
+        rangeMap[rangeMap.length-1].end = realString.length-1;
+    }
+    return{
+        rangeMap : rangeMap,
+        braceMap : braceMap,
+        value    : realString
     }
 };
-/*
-For now, I'll use the iteration version because this recursive method is far slower
 
-
-var parsePlaceholder = function(placeholder, mask, recObj){
-    if(typeof placeholder === 'undefined' ){
-        throw new Error("placeholder undefined");
-    }
-    if( typeof mask === 'undefined'){
-        mask = " ";
-    }
-    if(typeof recObj === 'undefined'){
-        recObj = {
-            charMap : [],
-            braceCount : 0,
-            totalBraces: 0,
-            newString  : "",
-            s : placeholder.replace(/[#]/g, mask).split(''),
-            i : 0,
-            j : 0
-        }
-    }else{
-        recObj.i++;
-    }
-
-    switch(recObj.braceCount){
-        case 0:
-            if(recObj.s[0] === '{' ){
-                recObj.s.shift();
-                recObj.braceCount++;
-                recObj.totalBraces++;
-            }else{
-                recObj.newString += recObj.s.shift();
-            }
-            break;
-        case 1:
-            if(recObj.s[0] === '}'){
-                recObj.s.shift();
-                recObj.braceCount--;
-                recObj.totalBraces++;
-            }else{
-                recObj.newString += recObj.s.shift();
-                recObj.charMap.push(recObj.i);
-            }
-            break;
-    }
-
-    if(recObj.s.length > 0){
-        GoodForm.parsePlaceholder(placeholder, mask, recObj)
-    }
-    if(recObj.s.length===0){
-        return {
-            value : recObj.newString,
-            charMap : recObj.charMap,
-            numberMask : mask
-        };
-    }
-
-};
-*/
-GoodForm.parsePlaceholder = parsePlaceholder;
+GoodForm.phoneAPI = phoneAPI;

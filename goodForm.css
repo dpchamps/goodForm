@@ -1,3 +1,6 @@
+html, body{
+    background: #2980b9;
+}
 .form-field-outer{
     max-width: 400px;
     width: 100%;
@@ -35,11 +38,13 @@ label{
 input{
 
 }
-textarea, input{
-    width: 250px;
-    padding: 5px;
-    letter-spacing:1px;
-    font-size: 17px;
+textarea, input {
+    color: #34495e;
+    border: none;
+    padding: 20px;
+    letter-spacing: 1px;
+    font-size: 40px;
+    width: 100%;
 }
 
 label{
@@ -62,8 +67,17 @@ button#submit{
     margin: 10px 0px;
 }
 .valid{
-    border-color: green;
+    background: #2ecc71;
 }
 .invalid{
-    border-color: red;
+   background: #e67e22;
+}
+
+.absolute-center{
+    position: absolute;
+    height: 40px;
+    width: 100%;
+    max-width: 350px;
+    margin: auto;
+    top:0;bottom:0;left:0;right:0
 }

@@ -7,17 +7,15 @@
 
 </head>
 <body>
-<input id="phone" type="tel" placeholder="(555) 555 5555" required="true"/>
+<form class="absolute-center">
+    <input  id="phone" type="tel" placeholder="{(}###{)}{ }###{ }####" data-addnumbermask=" " required="true"/>
+    <input  id="phone" type="date" required="true"/>
+</form>
 <br><br>
-<input id="phone2" type="tel" placeholder="(555) 555 5555" required="true" maxlength="14"/>
 </body>
-
 <script src="../dist/goodForm.js"></script>
 <script>
 
-    GoodForm.addNumberMask("phone", {
-        placeholder: "{(}###{)}{ }###{ }####",
-        numberMask: " "
-    });
+
 </script>
 </html>

@@ -13,7 +13,6 @@ GoodForm.helpers = {
         }
 
         if(found){
-            //
         }else{
             elm.className += " "+str;
         }
