@@ -17,6 +17,9 @@ GoodForm.helpers = {
             elm.className += " "+str;
         }
     },
+    splice : function(string, start, end, replace){
+        return string.substring(0, start)+replace+string.substring(end);
+    },
     removeClass : function(elm, str){
         var exp = new RegExp("(?:^|\\s)"+str+"(?!\\S)", "g");
         elm.className = elm.className.replace(exp, '');

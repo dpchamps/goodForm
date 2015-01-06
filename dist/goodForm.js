@@ -30,6 +30,9 @@ GoodForm.helpers = {
             elm.className += " "+str;
         }
     },
+    splice : function(string, start, end, replace){
+        return string.substring(0, start)+replace+string.substring(end);
+    },
     removeClass : function(elm, str){
         var exp = new RegExp("(?:^|\\s)"+str+"(?!\\S)", "g");
         elm.className = elm.className.replace(exp, '');
@@ -72,7 +75,7 @@ var phoneAPI = function(placeholder){
             //if a current range is open, it becomes closed at the idx before the next open brace
             if(rangeStart){
                 rangeStart = false;
-                rangeMap[rangeMap.length-1].end = realString.length-1;
+                rangeMap[rangeMap.length-1].end = realString.length;
             }
             continue;
         }
@@ -231,6 +234,122 @@ GoodForm.addNumberMask = function(id, maskObject){
 };
     */
 
+var addNumberMask = function(el){
+    var dset = el.dataset.addnumbermask,
+        selectionRange = {},
+        mask = GoodForm.phoneAPI(dset),
+        actualText = "",
+        //this contains a number that corresponds with the number of ranges filled
+        rangeIdx = 0,
+        curRangeVal = "";
+
+    //returns true if value is between start and end
+    function isBetween(start, end, value){
+        if(value >= start && value <= end){
+            return true;
+        }
+        return false;
+    };
+
+    function resetRange(map){
+        var origRange = mask.value.substring(map.start, map.end);
+        el.value = GoodForm.helpers.splice(el.value, map.start, map.end, origRange);
+        el.setSelectionRange(map.start, map.end);
+        curRangeVal = "";
+    }
+    function setRangeAtIdx(){
+        el.setSelectionRange(mask.rangeMap[rangeIdx].start, mask.rangeMap[rangeIdx].end );
+    }
+    function keydownListener(e){
+        if(e.which < 48) {
+            e.preventDefault();
+            switch (e.which) {
+                case(8):
+                    resetRange(mask.rangeMap[rangeIdx]);
+
+                    break;
+                case(46):
+                    resetRange(mask.rangeMap[rangeIdx]);
+                    break;
+                case(9):
+                    if(rangeIdx < mask.rangeMap.length-1){
+                        rangeIdx++;
+                        setRangeAtIdx();
+                        curRangeVal = "";
+
+                    }
+                    break;
+                //left arrow
+                case(37):
+                    if(rangeIdx > 0){
+                        rangeIdx--;
+                        setRangeAtIdx();
+                        curRangeVal = "";
+
+                    }
+                    break;
+                //right arrow
+                case(39):
+                    if(rangeIdx < mask.rangeMap.length-1){
+                        rangeIdx++;
+                        setRangeAtIdx();
+                    }
+            }
+        }
+    }
+    function keypressListener(e){
+        e.preventDefault();
+        //so first we make sure that the user is focused on the current range
+        setRangeAtIdx();
+        var range = mask.rangeMap[rangeIdx],
+            val = el.value.substring(range.start, range.end);
+
+        if(curRangeVal.length === val.length){
+            if(rangeIdx < mask.rangeMap.length-1){
+                rangeIdx++;
+                setRangeAtIdx();
+                curRangeVal = "";
+            }
+        }else{
+            curRangeVal += String.fromCharCode(e.which);
+            val = GoodForm.helpers.splice(val, 0, curRangeVal.length, curRangeVal);
+            console.log(curRangeVal, val);
+            el.value = GoodForm.helpers.splice(el.value, range.start, range.end, val);
+            if(curRangeVal.length === val.length && rangeIdx < mask.rangeMap.length-1){
+                rangeIdx++;
+                curRangeVal = "";
+            }
+            setRangeAtIdx();
+        }
+    }
+
+    el.maxLength = mask.value.length;
+    el.value = mask.value;
+    el.addEventListener('click', function(e){
+        e.preventDefault();
+        var selectIdx = el.selectionStart,
+            found = false;
+        mask.rangeMap.forEach(function(range, idx){
+            if(isBetween(range.start, range.end, selectIdx)){
+                el.setSelectionRange(range.start, range.end);
+                found = true;
+                rangeIdx = idx;
+            }
+        });
+        if(!found){
+            el.setSelectionRange(mask.rangeMap[0].start, mask.rangeMap[0].end);
+            rangeIdx = 0;
+        }
+        var rangeMap = mask.rangeMap[rangeIdx];
+
+    });
+    el.addEventListener('keydown', keydownListener, false);
+    el.addEventListener('keypress', keypressListener, false);
+
+};
+
+GoodForm.addNumberMask = addNumberMask;
+
 /**
  * Created by Dave on 12/31/2014.
  */
@@ -238,15 +357,11 @@ GoodForm.addNumberMask = function(id, maskObject){
 //root.GoodForm = GoodForm;
 
 
-var nl = document.querySelectorAll('[data-addnumbermask]');
-var selectors = Array.prototype.slice.call(nl);
+var nl = document.querySelectorAll('[data-addnumbermask]'),
+    selectors = Array.prototype.slice.call(nl);
 
 selectors.forEach(function(el){
-    //GoodForm.addNumberMask
-   GoodForm.addNumberMask(el.id, {
-       placeholder: el.placeholder,
-       numberMask: el.dataset.addnumbermask
-   });
+   GoodForm.addNumberMask(el);
 });
 
 

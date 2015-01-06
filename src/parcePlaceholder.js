@@ -22,7 +22,7 @@ var phoneAPI = function(placeholder){
             //if a current range is open, it becomes closed at the idx before the next open brace
             if(rangeStart){
                 rangeStart = false;
-                rangeMap[rangeMap.length-1].end = realString.length-1;
+                rangeMap[rangeMap.length-1].end = realString.length;
             }
             continue;
         }
