@@ -132,9 +132,10 @@ var addNumberMask = function(el){
     function isBetween(start, end, value){
         if(value >= start && value <= end){
             return true;
+        }else{
+            return false;
         }
-        return false;
-    };
+    }
 
     function resetRange(map){
         var origRange = mask.value.substring(map.start, map.end);
@@ -145,14 +146,38 @@ var addNumberMask = function(el){
     function setRangeAtIdx(){
         el.setSelectionRange(mask.rangeMap[rangeIdx].start, mask.rangeMap[rangeIdx].end );
     }
+    function addChar(char){
+        var range = mask.rangeMap[rangeIdx],
+            val = el.value.substring(range.start, range.end);
+
+        if(curRangeVal.length === val.length){
+            if(rangeIdx < mask.rangeMap.length-1){
+                rangeIdx++;
+                setRangeAtIdx();
+                curRangeVal = "";
+            }
+        }else{
+            curRangeVal += char;
+            val = GoodForm.helpers.splice(val, 0, curRangeVal.length, curRangeVal);
+            el.value = GoodForm.helpers.splice(el.value, range.start, range.end, val);
+            if(curRangeVal.length === val.length && rangeIdx < mask.rangeMap.length-1){
+                rangeIdx++;
+                curRangeVal = "";
+            }
+            setRangeAtIdx();
+        }
+    }
     function keydownListener(e){
         if(e.which < 48) {
             e.preventDefault();
             switch (e.which) {
+                //backspace
                 case(8):
-                    resetRange(mask.rangeMap[rangeIdx]);
+                    //splice the last character with the original value
+
 
                     break;
+                //del
                 case(46):
                     resetRange(mask.rangeMap[rangeIdx]);
                     break;
@@ -186,26 +211,7 @@ var addNumberMask = function(el){
         e.preventDefault();
         //so first we make sure that the user is focused on the current range
         setRangeAtIdx();
-        var range = mask.rangeMap[rangeIdx],
-            val = el.value.substring(range.start, range.end);
-
-        if(curRangeVal.length === val.length){
-            if(rangeIdx < mask.rangeMap.length-1){
-                rangeIdx++;
-                setRangeAtIdx();
-                curRangeVal = "";
-            }
-        }else{
-            curRangeVal += String.fromCharCode(e.which);
-            val = GoodForm.helpers.splice(val, 0, curRangeVal.length, curRangeVal);
-            console.log(curRangeVal, val);
-            el.value = GoodForm.helpers.splice(el.value, range.start, range.end, val);
-            if(curRangeVal.length === val.length && rangeIdx < mask.rangeMap.length-1){
-                rangeIdx++;
-                curRangeVal = "";
-            }
-            setRangeAtIdx();
-        }
+        addChar(String.fromCharCode(e.which));
     }
 
     el.maxLength = mask.value.length;
