@@ -118,7 +118,9 @@ GoodForm.addNumberMask = function(id, maskObject){
     el.addEventListener('blur', blurListener, false);
 };
     */
-
+/*todo: NEXT # validation;
+        removeChar fails when the user has pressed tab or the arrow keys
+*/
 var addNumberMask = function(el){
     var dset = el.dataset.addnumbermask,
         selectionRange = {},
@@ -167,13 +169,34 @@ var addNumberMask = function(el){
             setRangeAtIdx();
         }
     }
+    function removeChar(){
+        var range = mask.rangeMap[rangeIdx],
+            val = mask.value.substring(range.start, range.end);
+
+        //ther user pressed backspace, entering the range at the end
+        //
+        if(curRangeVal === "" && rangeIdx > 0){
+            //go back one range
+            rangeIdx--;
+            setRangeAtIdx();
+            range = mask.rangeMap[rangeIdx];
+            curRangeVal = el.value.substring(range.start, range.end);
+            removeChar();
+        }else{
+            //remove last character from current value
+            curRangeVal = curRangeVal.slice(0, curRangeVal.length-1);
+            val = GoodForm.helpers.splice(val, 0, curRangeVal.length, curRangeVal);
+            el.value = GoodForm.helpers.splice(el.value, range.start, range.end, val);
+            setRangeAtIdx();
+        }
+    }
     function keydownListener(e){
         if(e.which < 48) {
             e.preventDefault();
             switch (e.which) {
                 //backspace
                 case(8):
-                    //splice the last character with the original value
+                    removeChar();
 
 
                     break;
@@ -182,6 +205,7 @@ var addNumberMask = function(el){
                     resetRange(mask.rangeMap[rangeIdx]);
                     break;
                 case(9):
+                    //tab
                     if(rangeIdx < mask.rangeMap.length-1){
                         rangeIdx++;
                         setRangeAtIdx();
